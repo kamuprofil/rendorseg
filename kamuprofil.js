@@ -20,7 +20,7 @@ async function getList() {
 function addCommentLabels() {
     getList().then(fakeAccounts => {
         for (const name of fakeAccounts) {
-            const comments = document.querySelectorAll('a[href*="' + name + '"]');
+            const comments = document.querySelectorAll('div ul div[role=article] a[href*="' + name + '"]');
             for (const comment of comments) {
                 const style = comment.getAttribute("style");
                 if (style === undefined || style == null) {
