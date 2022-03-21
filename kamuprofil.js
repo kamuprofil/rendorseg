@@ -1,4 +1,5 @@
 document.addEventListener("click", addCommentLabels);
+document.addEventListener("load",  addCommentLabels, true);
 
 let fakeAccounts = [];
 
