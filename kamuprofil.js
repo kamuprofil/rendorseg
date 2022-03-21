@@ -2,7 +2,7 @@ document.addEventListener("click", kamuProfil);
 document.addEventListener("load",  kamuProfil, true);
 
 async function getList() {
-    var response;
+    let response;
     try {
         response = await fetch("https://raw.githubusercontent.com/kamuprofil/rendorseg/main/lista.json")
     } catch (e) {
@@ -18,23 +18,19 @@ async function getList() {
 }
 
 function kamuProfil() {
-    getList().then(resp => {
-        for (var j = 0; j < resp.length; j++) {
-            var name = resp[j];
+    getList().then(fakeAccounts => {
+        for (const name of fakeAccounts) {
+            const spans = document.querySelectorAll('a[href*="' + name + '"]');
+            for (const sp of spans) {
+                const prevStyle = sp.getAttribute("style");
+                if (prevStyle === undefined || prevStyle == null) {
+                    sp.setAttribute("style", "color: red");
 
-            var spans = document.querySelectorAll('a[href*="' + name + '"]');
-            if (spans.length > 0) {
-                spans.forEach(sp => {
-                    var prevStyle = sp.getAttribute("style");
-                    if (prevStyle === undefined || prevStyle == null) {
-                        sp.setAttribute("style", "color: red");
+                    const lbl = document.createElement("span");
+                    lbl.innerHTML = "Kamu Profil ";
 
-                        var lbl = document.createElement("span");
-                        lbl.innerHTML = "Kamu Profil ";
-
-                        sp.prepend(lbl);
-                    }
-                });
+                    sp.prepend(lbl);
+                }
             }
         }
     });
