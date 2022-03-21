@@ -1,5 +1,11 @@
 document.addEventListener("click", addCommentLabels);
-document.addEventListener("load",  addCommentLabels, true);
+
+let fakeAccounts = [];
+
+async function init() {
+    fakeAccounts = await getList();
+    addCommentLabels();
+}
 
 async function getList() {
     let response;
@@ -18,20 +24,20 @@ async function getList() {
 }
 
 function addCommentLabels() {
-    getList().then(fakeAccounts => {
-        for (const name of fakeAccounts) {
-            const comments = document.querySelectorAll('div ul div[role=article] a[href*="' + name + '"]');
-            for (const comment of comments) {
-                const style = comment.getAttribute("style");
-                if (style === undefined || style == null) {
-                    comment.setAttribute("style", "color: red");
+    for (const name of fakeAccounts) {
+        const comments = document.querySelectorAll('div ul div[role=article] a[href*="' + name + '"]');
+        for (const comment of comments) {
+            const style = comment.getAttribute("style");
+            if (style === undefined || style == null) {
+                comment.setAttribute("style", "color: red");
 
-                    const label = document.createElement("span");
-                    label.innerHTML = "Kamu Profil ";
+                const label = document.createElement("span");
+                label.innerHTML = "Kamu Profil ";
 
-                    comment.prepend(label);
-                }
+                comment.prepend(label);
             }
         }
-    });
+    }
 }
+
+init();
