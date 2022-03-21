@@ -1,5 +1,5 @@
-document.addEventListener("click", kamuProfil);
-document.addEventListener("load",  kamuProfil, true);
+document.addEventListener("click", addCommentLabels);
+document.addEventListener("load",  addCommentLabels, true);
 
 async function getList() {
     let response;
@@ -17,19 +17,19 @@ async function getList() {
     return await response.json();
 }
 
-function kamuProfil() {
+function addCommentLabels() {
     getList().then(fakeAccounts => {
         for (const name of fakeAccounts) {
-            const spans = document.querySelectorAll('a[href*="' + name + '"]');
-            for (const sp of spans) {
-                const prevStyle = sp.getAttribute("style");
-                if (prevStyle === undefined || prevStyle == null) {
-                    sp.setAttribute("style", "color: red");
+            const comments = document.querySelectorAll('a[href*="' + name + '"]');
+            for (const comment of comments) {
+                const style = comment.getAttribute("style");
+                if (style === undefined || style == null) {
+                    comment.setAttribute("style", "color: red");
 
-                    const lbl = document.createElement("span");
-                    lbl.innerHTML = "Kamu Profil ";
+                    const label = document.createElement("span");
+                    label.innerHTML = "Kamu Profil ";
 
-                    sp.prepend(lbl);
+                    comment.prepend(label);
                 }
             }
         }
