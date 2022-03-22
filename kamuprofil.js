@@ -24,18 +24,24 @@ async function getList() {
     return await response.json();
 }
 
+function createLabelElement() {
+    const element = document.createElement('span');
+    const text = document.createTextNode('Kamu Profil ');
+    element.appendChild(text);
+    element.setAttribute('style', 'color: red');
+    return element;
+}
+
 function addCommentLabels() {
     for (const name of fakeAccounts) {
         const commentSelector = 'div ul div[role=article]';
         const commentAuthors = document.querySelectorAll(`${commentSelector} a[href*="${name}"] > span`);
-        for (const comment of commentAuthors) {
-            const style = comment.getAttribute("style");
-            if (style === undefined || style == null) {
-                comment.setAttribute("style", "color: red");
-
-                const label = document.createElement("span");
-                label.innerHTML = "Kamu Profil ";
-
+        for (const commentAuthor of commentAuthors) {
+            const comment = commentAuthor.parentNode;
+            const hasLabel = comment.getAttribute('data-has-label');
+            if (!hasLabel) {
+                comment.setAttribute('data-has-label', 'fake');
+                const label = createLabelElement();
                 comment.prepend(label);
             }
         }
