@@ -24,14 +24,21 @@ async function getList() {
     return await response.json();
 }
 
-function createLabelElement() {
+function createLabelElement(label) {
     const element = document.createElement('span');
-    const text = document.createTextNode('Kamu Profil ');
+    element.setAttribute('style', `color: ${label.color}`);
+
+    const text = document.createTextNode(`${label.text} `);
     element.appendChild(text);
-    element.setAttribute('style', 'color: red');
+
     return element;
 }
-const labelTemplate = createLabelElement();
+
+const fakeLabel = {
+    text: 'Kamu Profil',
+    color: '#f00',
+};
+const labelTemplate = createLabelElement(fakeLabel);
 
 function addCommentLabels() {
     for (const name of fakeAccounts) {
