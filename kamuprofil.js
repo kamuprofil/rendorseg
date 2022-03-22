@@ -26,8 +26,9 @@ async function getList() {
 
 function addCommentLabels() {
     for (const name of fakeAccounts) {
-        const comments = document.querySelectorAll('div ul div[role=article] a[href*="' + name + '"]');
-        for (const comment of comments) {
+        const commentSelector = 'div ul div[role=article]';
+        const commentAuthors = document.querySelectorAll(`${commentSelector} a[href*="${name}"] > span`);
+        for (const comment of commentAuthors) {
             const style = comment.getAttribute("style");
             if (style === undefined || style == null) {
                 comment.setAttribute("style", "color: red");
