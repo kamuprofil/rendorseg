@@ -33,6 +33,9 @@ function createLabelElement(label) {
 
     return element;
 }
+function addImageBorder(element, label) {
+    element.setAttribute('style', `border: 3px solid ${label.color}; border-radius: 100%;`);
+}
 
 const fakeLabel = {
     text: 'Kamu Profil',
@@ -43,6 +46,8 @@ const labelTemplate = createLabelElement(fakeLabel);
 function addCommentLabels() {
     for (const name of fakeAccounts) {
         const commentSelector = 'div ul div[role=article]';
+
+        // Add label to author names
         const commentAuthors = document.querySelectorAll(`${commentSelector} a[href*="${name}"] > span`);
         for (const commentAuthor of commentAuthors) {
             const comment = commentAuthor.parentNode;
@@ -51,6 +56,17 @@ function addCommentLabels() {
                 comment.setAttribute('data-has-label', 'fake');
                 const label = labelTemplate.cloneNode(true);
                 comment.prepend(label);
+            }
+        }
+
+        // Add highlight to author images
+        const commentImages = document.querySelectorAll(`${commentSelector} a[href*="${name}"] > div`);
+        for (const commentImage of commentImages) {
+            const anchor = commentImage.parentNode;
+            const hasLabel = anchor.getAttribute('data-has-label');
+            if (!hasLabel) {
+                anchor.setAttribute('data-has-label', 'fake');
+                addImageBorder(anchor, fakeLabel)
             }
         }
     }
