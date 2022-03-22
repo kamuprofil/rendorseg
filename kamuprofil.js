@@ -31,6 +31,7 @@ function createLabelElement() {
     element.setAttribute('style', 'color: red');
     return element;
 }
+const labelTemplate = createLabelElement();
 
 function addCommentLabels() {
     for (const name of fakeAccounts) {
@@ -41,7 +42,7 @@ function addCommentLabels() {
             const hasLabel = comment.getAttribute('data-has-label');
             if (!hasLabel) {
                 comment.setAttribute('data-has-label', 'fake');
-                const label = createLabelElement();
+                const label = labelTemplate.cloneNode(true);
                 comment.prepend(label);
             }
         }
