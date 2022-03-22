@@ -26,9 +26,15 @@ async function getList() {
 
 function createLabelElement(label) {
     const element = document.createElement('span');
-    element.setAttribute('style', `color: ${label.color}`);
+    element.setAttribute('style', `
+        background-color: ${label.color};
+        color: ${label.contrast};
+        padding: 0 4px;
+        border-radius: 4px;
+        margin-right: 4px;
+    `);
 
-    const text = document.createTextNode(`${label.text} `);
+    const text = document.createTextNode(`${label.text}`);
     element.appendChild(text);
 
     return element;
@@ -40,6 +46,7 @@ function addImageBorder(element, label) {
 const fakeLabel = {
     text: 'Kamu Profil',
     color: '#f00',
+    contrast: '#fff',
 };
 const labelTemplate = createLabelElement(fakeLabel);
 
