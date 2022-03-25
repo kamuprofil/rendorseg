@@ -1,6 +1,7 @@
 document.addEventListener("click", addCommentLabels);
 document.addEventListener("load",  addCommentLabels, true);
 
+//-- Utilities
 /** Converts an array of usernames into a dictionary usable for direct lookup. */
 function toLookup(list) {
     const lookup = {};
@@ -10,6 +11,18 @@ function toLookup(list) {
     return lookup;
 }
 
+/** Selects elements whose direct children match another selector.
+ *
+ * An alternative to the :has() selector, which has minimal support. Fixed depth restriction allows for faster code. */
+function* hasChild(selector, hasSelector) {
+    const descendants = document.querySelectorAll(`${selector} ${hasSelector}`);
+    for (const child of descendants) {
+        // Navigate back up to the elements we want to select, return those
+        yield child.parentElement;
+    }
+}
+
+//-- Main extension code
 let fakeAccounts = {};
 
 async function init() {
@@ -87,9 +100,8 @@ function addCommentLabels() {
 
     // Add label to author names
     // TODO: Try to exclude links to comments here already
-    const commentAuthors = document.querySelectorAll(`${commentSelector} a[href]:not([data-has-label]) > span`);
-    for (const commentAuthor of commentAuthors) {
-        const comment = commentAuthor.parentNode;
+    const commentAuthors = hasChild(`${commentSelector} a[href]:not([data-has-label])`, `> span`);
+    for (const comment of commentAuthors) {
         const hasLabel = comment.getAttribute('data-has-label');
         if (!hasLabel) {
             const accountName = extractAccountName(comment.getAttribute('href'));
@@ -104,9 +116,8 @@ function addCommentLabels() {
     }
 
     // Add highlight to author images
-    const commentImages = document.querySelectorAll(`${commentSelector} a[href]:not([data-has-label]) > div`);
-    for (const commentImage of commentImages) {
-        const anchor = commentImage.parentNode;
+    const commentImages = hasChild(`${commentSelector} a[href]:not([data-has-label])`, `> div`);
+    for (const anchor of commentImages) {
         const hasLabel = anchor.getAttribute('data-has-label');
         if (!hasLabel) {
             const accountName = extractAccountName(anchor.getAttribute('href'));
