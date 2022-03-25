@@ -112,25 +112,19 @@ function addCommentLabels() {
     // TODO: Try to exclude links to comments here already
     const commentAuthors = hasChild(`${commentSelector} a[href]:not([data-has-label])`, `> span`);
     for (const comment of commentAuthors) {
-        const hasLabel = comment.getAttribute('data-has-label');
-        if (!hasLabel) {
-            const needsLabel = processAnchor(comment);
-            if (needsLabel) {
-                const label = labelTemplate.cloneNode(true);
-                comment.prepend(label);
-            }
+        const needsLabel = processAnchor(comment);
+        if (needsLabel) {
+            const label = labelTemplate.cloneNode(true);
+            comment.prepend(label);
         }
     }
 
     // Add highlight to author images
     const commentImages = hasChild(`${commentSelector} a[href]:not([data-has-label])`, `> div`);
     for (const anchor of commentImages) {
-        const hasLabel = anchor.getAttribute('data-has-label');
-        if (!hasLabel) {
-            const needsLabel = processAnchor(anchor);
-            if (needsLabel) {
-                addImageBorder(anchor, fakeLabel)
-            }
+        const needsLabel = processAnchor(anchor);
+        if (needsLabel) {
+            addImageBorder(anchor, fakeLabel)
         }
     }
 }
