@@ -89,6 +89,16 @@ function extractAccountName(url) {
     return null;
 }
 
+/** Determine what label an anchor element needs based on the link, and mark it as processed. */
+function processAnchor(anchor) {
+    const accountName = extractAccountName(anchor.getAttribute('href'));
+    const needsLabel = fakeAccounts[accountName];
+    anchor.setAttribute('data-has-label', needsLabel ? 'fake' : 'null');
+    return needsLabel;
+}
+
+const commentSelector = 'div ul div[role=article]';
+
 /** Adds labels to all new elements.
  *
  * Elements that have already been processed get a 'data-has-label' attribute, and are ignored afterwards.
@@ -104,10 +114,7 @@ function addCommentLabels() {
     for (const comment of commentAuthors) {
         const hasLabel = comment.getAttribute('data-has-label');
         if (!hasLabel) {
-            const accountName = extractAccountName(comment.getAttribute('href'));
-            const needsLabel = fakeAccounts[accountName];
-            // Mark element as processed, even if unlabeled
-            comment.setAttribute('data-has-label', needsLabel ? 'fake' : 'null');
+            const needsLabel = processAnchor(comment);
             if (needsLabel) {
                 const label = labelTemplate.cloneNode(true);
                 comment.prepend(label);
@@ -120,9 +127,7 @@ function addCommentLabels() {
     for (const anchor of commentImages) {
         const hasLabel = anchor.getAttribute('data-has-label');
         if (!hasLabel) {
-            const accountName = extractAccountName(anchor.getAttribute('href'));
-            const needsLabel = fakeAccounts[accountName];
-            anchor.setAttribute('data-has-label', needsLabel ? 'fake' : 'null');
+            const needsLabel = processAnchor(anchor);
             if (needsLabel) {
                 addImageBorder(anchor, fakeLabel)
             }
