@@ -2,11 +2,13 @@ document.addEventListener("click", addCommentLabels);
 document.addEventListener("load",  addCommentLabels, true);
 
 //-- Utilities
-/** Converts an array of usernames into a dictionary usable for direct lookup. */
-function toLookup(list) {
+/** Converts an array of usernames into a dictionary usable for direct lookup.
+ *
+ * The provided value will be returned on lookup, used to identify different sources after merging lookup tables. */
+function toLookup(lookupResult, list) {
     const lookup = {};
     for (const value of list) {
-        lookup[value] = true;
+        lookup[value] = lookupResult;
     }
     return lookup;
 }
@@ -23,10 +25,29 @@ function* hasChild(selector, hasSelector) {
 }
 
 //-- Main extension code
-let fakeAccounts = {};
+const labels = {
+    fake: createLabel({
+        text: 'Kamu Profil',
+        color: '#f00',
+        contrast: '#fff',
+        hide: false,
+    }),
+    prop: createLabel({
+        text: 'Propaganda',
+        color: '#ff6a00',
+        contrast: '#fff',
+        hide: false,
+    })
+}
 
+let accountLookup = {}
 async function init() {
-    fakeAccounts = toLookup(await getList());
+    const fakeAccounts = toLookup('fake', await getList());
+    accountLookup = {
+        // Add more user lists here...
+        ...fakeAccounts,
+    };
+
     addCommentLabels();
 }
 
@@ -65,12 +86,14 @@ function addImageBorder(element, label) {
     element.setAttribute('style', `border: 3px solid ${label.color}; border-radius: 100%;`);
 }
 
-const fakeLabel = {
-    text: 'Kamu Profil',
-    color: '#f00',
-    contrast: '#fff',
-};
-const labelTemplate = createLabelElement(fakeLabel);
+/** Create runtime data structures needed for rendering a label. */
+function createLabel(config) {
+    const template = createLabelElement(config);
+    return {
+        ...config,
+        template,
+    }
+}
 
 const profileUrlPattern = /^https:\/\/www\.facebook\.com\/profile\.php\?id=(\d+)/;
 const aliasUrlPattern = /^https:\/\/www\.facebook\.com\/([a-zA-Z0-9.]+)/;
@@ -92,8 +115,8 @@ function extractAccountName(url) {
 /** Determine what label an anchor element needs based on the link, and mark it as processed. */
 function processAnchor(anchor) {
     const accountName = extractAccountName(anchor.getAttribute('href'));
-    const needsLabel = fakeAccounts[accountName];
-    anchor.setAttribute('data-has-label', needsLabel ? 'fake' : 'null');
+    const needsLabel = accountLookup[accountName];
+    anchor.setAttribute('data-has-label', needsLabel ?? 'null');
     return needsLabel;
 }
 
@@ -106,15 +129,13 @@ const commentSelector = 'div ul div[role=article]';
  * is applied (if any).
  */
 function addCommentLabels() {
-    const commentSelector = 'div ul div[role=article]';
-
     // Add label to author names
     // TODO: Try to exclude links to comments here already
     const commentAuthors = hasChild(`${commentSelector} a[href]:not([data-has-label])`, `> span`);
     for (const comment of commentAuthors) {
         const needsLabel = processAnchor(comment);
         if (needsLabel) {
-            const label = labelTemplate.cloneNode(true);
+            const label = labels[needsLabel].template.cloneNode(true);
             comment.prepend(label);
         }
     }
@@ -124,7 +145,7 @@ function addCommentLabels() {
     for (const anchor of commentImages) {
         const needsLabel = processAnchor(anchor);
         if (needsLabel) {
-            addImageBorder(anchor, fakeLabel)
+            addImageBorder(anchor, labels[needsLabel])
         }
     }
 }
