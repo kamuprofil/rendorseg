@@ -5,10 +5,12 @@ document.addEventListener("load",  addCommentLabels, true);
 /** Converts an array of usernames into a dictionary usable for direct lookup.
  *
  * The provided value will be returned on lookup, used to identify different sources after merging lookup tables. */
-function toLookup(lookupResult, list) {
+function toLookup(lookupResult, accounts) {
     const lookup = {};
-    for (const value of list) {
-        lookup[value] = lookupResult;
+    for (const account of accounts) {
+        for (const name of account.names) {
+            lookup[name] = lookupResult;
+        }
     }
     return lookup;
 }
