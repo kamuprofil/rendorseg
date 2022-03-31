@@ -1,6 +1,3 @@
-document.addEventListener("click", addCommentLabels);
-document.addEventListener("load",  addCommentLabels, true);
-
 //-- Utilities
 /** Converts an array of usernames into a dictionary usable for direct lookup.
  *
@@ -50,7 +47,15 @@ async function init() {
         ...fakeAccounts,
     };
 
+    // Check DOM immediately, and every second
     addCommentLabels();
+    setInterval(addCommentLabels, 1000);
+
+    // Re-check DOM after each click (opening replies, etc)
+    document.addEventListener('click', function() {
+        // Wait for all other click handlers to be processed first
+        setTimeout(addCommentLabels, 0);
+    });
 }
 
 async function getList() {
