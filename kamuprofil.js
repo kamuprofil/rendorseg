@@ -39,13 +39,21 @@ const labels = {
     })
 }
 
+const FAKE_ACCOUNT_URL = "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/lista.json";
+
 let accountLookup = {}
 async function init() {
-    const fakeAccounts = toLookup('fake', await getList());
-    accountLookup = {
-        // Add more user lists here...
-        ...fakeAccounts,
-    };
+    // Load built-in user list
+    try {
+        const fakeAccounts = toLookup('fake', await fetchJson(FAKE_ACCOUNT_URL));
+        accountLookup = {
+            // Add more user lists here...
+            ...fakeAccounts,
+        };
+    } catch (err) {
+        console.error("Error fetching fake account list: " + err);
+        return;
+    }
 
     // Check DOM immediately, and every second
     addCommentLabels();
@@ -58,19 +66,8 @@ async function init() {
     });
 }
 
-async function getList() {
-    let response;
-    try {
-        response = await fetch("https://raw.githubusercontent.com/kamuprofil/rendorseg/main/lista.json")
-    } catch (e) {
-        console.error("Error fetching fake account list - " + e);
-        return [];
-    }
-    if (!response.ok) {
-        console.error("Error fetching fake account list - " + response.statusText);
-        return [];
-    }
-
+async function fetchJson(url) {
+    const response = await fetch(url)
     return await response.json();
 }
 
