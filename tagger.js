@@ -39,28 +39,28 @@ const labels = {
         color: '#f00',
         contrast: '#fff',
         hide: false,
+        source: "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/data/fake.json",
     }),
     prop: createLabel({
         text: 'Propaganda',
         color: '#ff6a00',
         contrast: '#fff',
         hide: false,
+        source: "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/data/ner.json",
     })
 }
 
-const FAKE_ACCOUNT_URL = "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/data/fake.json";
-
 let accountLookup = {}
 async function init() {
-    // Load built-in user list
+    // Load built-in user lists
     try {
-        const fakeAccounts = toLookup('fake', await fetchJson(FAKE_ACCOUNT_URL));
-        accountLookup = {
-            // Add more user lists here...
-            ...fakeAccounts,
-        };
+        for (const labelId in labels) {
+            const labelConfig = labels[labelId];
+            const lookup = toLookup(labelId, await fetchJson(labelConfig.source));
+            Object.assign(accountLookup, lookup);
+        }
     } catch (err) {
-        console.error("Error fetching fake account list: " + err);
+        console.error("Error fetching tagged account list: " + err);
         return;
     }
 
