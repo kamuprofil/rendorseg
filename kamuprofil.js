@@ -23,6 +23,15 @@ function* hasChild(selector, hasSelector) {
     }
 }
 
+/** Select an ancestor of an element, going up the given number of levels. */
+function ancestor(element, levels) {
+    let current = element;
+    for (let i = 0; i < levels; i++) {
+        current = current.parentElement;
+    }
+    return current;
+}
+
 //-- Main extension code
 const labels = {
     fake: createLabel({
@@ -56,13 +65,13 @@ async function init() {
     }
 
     // Check DOM immediately, and every second
-    addCommentLabels();
-    setInterval(addCommentLabels, 1000);
+    processElements();
+    setInterval(processElements, 1000);
 
     // Re-check DOM after each click (opening replies, etc)
     document.addEventListener('click', function() {
         // Wait for all other click handlers to be processed first
-        setTimeout(addCommentLabels, 0);
+        setTimeout(processElements, 0);
     });
 }
 
@@ -126,12 +135,7 @@ function processAnchor(anchor) {
 
 const commentSelector = 'div ul div[role=article]';
 
-/** Adds labels to all new elements.
- *
- * Elements that have already been processed get a 'data-has-label' attribute, and are ignored afterwards.
- * The relevant user info is extracted from the link an anchor element points to, and the user's corresponding label
- * is applied (if any).
- */
+/** Add labels to new comments on a post. */
 function addCommentLabels() {
     // Add label to author names
     // TODO: Try to exclude links to comments here already
@@ -152,6 +156,53 @@ function addCommentLabels() {
             addImageBorder(anchor, labels[needsLabel])
         }
     }
+}
+
+/** Adds labels to profiles show on the friends list. */
+function processFriendsList() {
+    // Find block containing friends list
+    const friendsHeader = document.querySelector('span > a[href$=friends]');
+    if (!friendsHeader) {
+        return;
+    }
+    const friendsBlock = ancestor(friendsHeader, 7);
+
+    // Add border to friend image
+    const friendImages = friendsBlock.querySelectorAll('div > div > a[role=link]:not([data-has-label]) > img');
+    for (const friendImage of friendImages) {
+        const anchor = friendImage.parentElement;
+        const needsLabel = processAnchor(anchor);
+        if (needsLabel) {
+            friendImage.setAttribute('style', `border: 3px solid ${labels[needsLabel].color};`);
+        }
+    }
+
+    // Add tag next to username
+    // TODO: Use extended hasChild with root node
+    const friendNames = friendsBlock.querySelectorAll('div > div > a[role=link]:not([data-has-label]) > span:first-child');
+    for (const friendName of friendNames) {
+        const anchor = friendName.parentElement;
+        const needsLabel = processAnchor(anchor);
+        if (needsLabel) {
+            const label = labels[needsLabel].template.cloneNode(true);
+            anchor.prepend(label);
+        }
+    }
+}
+
+/** Main entry point, adds labels to all new elements.
+ *
+ * Elements that have already been processed get a 'data-has-label' attribute, and are ignored afterwards.
+ * The relevant user info is extracted from the link an anchor element points to, and the user's corresponding label
+ * is applied (if any).
+ *
+ * The relevant elements are identified based on the surrounding DOM structures, since IDs and class names are
+ * machine generated, and not stable. So unfortunately we need some rather complicated selectors to find the elements
+ * we need.
+ */
+function processElements() {
+    addCommentLabels();
+    processFriendsList();
 }
 
 init();
