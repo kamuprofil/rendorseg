@@ -48,7 +48,7 @@ const labels = {
     })
 }
 
-const FAKE_ACCOUNT_URL = "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/lista.json";
+const FAKE_ACCOUNT_URL = "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/data/fake.json";
 
 let accountLookup = {}
 async function init() {

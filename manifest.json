@@ -14,12 +14,15 @@
   "content_scripts": [
     {
       "matches": ["*://*.facebook.com/*", "*://raw.githubusercontent.com/*"],
-      "js": ["kamuprofil.js"]
+      "js": ["tagger.js"]
     }
   ],
 
   "permissions": [
-    "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/lista.json", "webRequest", "activeTab"
+    "webRequest",
+    "activeTab",
+    "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/data/fake.json",
+    "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/data/ner.json"
   ]
 
 }
