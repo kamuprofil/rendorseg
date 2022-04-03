@@ -6,6 +6,6 @@ Ha szeretnél jelenteni egy kamu profilt akkor szólj a [Kamuprofil Rendőrségn
 
 Így néz ki amikor a plugin működik:
 
-![example](example.jpg)
+![example](example.png)
 
 Ez nyílt forráskódú szoftver de azért olvasd el a LICENSE-t is, hogy pontosan mit is ír ott.
