@@ -1,30 +1,22 @@
 {
-
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Kamuprofil Rendorseg",
   "version": "1.0",
-
   "description": "A Facebookon megjeloli a kamu profilokat.",
-
   "icons": {
     "48": "icons/icon48.png",
     "96": "icons/icon96.png"
   },
-
   "content_scripts": [
     {
-      "matches": ["*://*.facebook.com/*"],
+      "matches": ["*://*.facebook.com/*", "*://raw.githubusercontent.com/*"],
       "js": ["tagger.js"]
     }
   ],
-
   "permissions": [
     "webRequest",
-    "activeTab"
-  ],
-  "host_permissions": [
+    "activeTab",
     "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/data/fake.json",
     "https://raw.githubusercontent.com/kamuprofil/rendorseg/main/data/ner.json"
   ]
-
 }
