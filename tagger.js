@@ -50,14 +50,31 @@ const labels = {
     })
 }
 
+const debugLabel = createLabel({
+    text: 'Debug',
+    color: '#f0f',
+    contrast: '#000',
+});
+
+/** When enabled, applies a label to every element, regardless of URL. Useful for troubleshooting CSS selectors. */
+const debugMode = false;
+
 let accountLookup = {}
+async function initLabels() {
+    for (const labelId in labels) {
+        const labelConfig = labels[labelId];
+        const lookup = toLookup(labelId, await fetchJson(labelConfig.source));
+        Object.assign(accountLookup, lookup);
+    }
+}
+
+
 async function init() {
     // Load built-in user lists
     try {
-        for (const labelId in labels) {
-            const labelConfig = labels[labelId];
-            const lookup = toLookup(labelId, await fetchJson(labelConfig.source));
-            Object.assign(accountLookup, lookup);
+        // No lookups needed in debug mode
+        if (!debugMode) {
+            initLabels();
         }
     } catch (err) {
         console.error("Error fetching tagged account list: " + err);
@@ -127,6 +144,11 @@ function extractAccountName(url) {
 
 /** Determine what label an anchor element needs based on the link, and mark it as processed. */
 function processAnchor(anchor) {
+    if (debugMode) {
+        anchor.setAttribute('data-has-label', 'debug');
+        return debugLabel;
+    }
+
     const accountName = extractAccountName(anchor.getAttribute('href'));
     const needsLabel = accountLookup[accountName];
     anchor.setAttribute('data-has-label', needsLabel ?? 'null');
