@@ -130,7 +130,7 @@ function processAnchor(anchor) {
     const accountName = extractAccountName(anchor.getAttribute('href'));
     const needsLabel = accountLookup[accountName];
     anchor.setAttribute('data-has-label', needsLabel ?? 'null');
-    return needsLabel;
+    return labels[needsLabel];
 }
 
 const commentSelector = 'div ul div[role=article]';
@@ -141,9 +141,9 @@ function addCommentLabels() {
     // TODO: Try to exclude links to comments here already
     const commentAuthors = hasChild(`${commentSelector} a[href]:not([data-has-label])`, `> span`);
     for (const comment of commentAuthors) {
-        const needsLabel = processAnchor(comment);
-        if (needsLabel) {
-            const label = labels[needsLabel].template.cloneNode(true);
+        const matchingLabel = processAnchor(comment);
+        if (matchingLabel) {
+            const label = matchingLabel.template.cloneNode(true);
             comment.prepend(label);
         }
     }
@@ -151,9 +151,9 @@ function addCommentLabels() {
     // Add highlight to author images
     const commentImages = hasChild(`${commentSelector} a[href]:not([data-has-label])`, `> div`);
     for (const anchor of commentImages) {
-        const needsLabel = processAnchor(anchor);
-        if (needsLabel) {
-            addImageBorder(anchor, labels[needsLabel])
+        const matchingLabel = processAnchor(anchor);
+        if (matchingLabel) {
+            addImageBorder(anchor, matchingLabel)
         }
     }
 }
@@ -171,9 +171,9 @@ function processFriendsList() {
     const friendImages = friendsBlock.querySelectorAll('div > div > a[role=link]:not([data-has-label]) > img');
     for (const friendImage of friendImages) {
         const anchor = friendImage.parentElement;
-        const needsLabel = processAnchor(anchor);
-        if (needsLabel) {
-            friendImage.setAttribute('style', `border: 3px solid ${labels[needsLabel].color};`);
+        const matchingLabel = processAnchor(anchor);
+        if (matchingLabel) {
+            friendImage.setAttribute('style', `border: 3px solid ${matchingLabel.color};`);
         }
     }
 
@@ -182,9 +182,9 @@ function processFriendsList() {
     const friendNames = friendsBlock.querySelectorAll('div > div > a[role=link]:not([data-has-label]) > span:first-child');
     for (const friendName of friendNames) {
         const anchor = friendName.parentElement;
-        const needsLabel = processAnchor(anchor);
-        if (needsLabel) {
-            const label = labels[needsLabel].template.cloneNode(true);
+        const matchingLabel = processAnchor(anchor);
+        if (matchingLabel) {
+            const label = matchingLabel.template.cloneNode(true);
             anchor.prepend(label);
         }
     }
