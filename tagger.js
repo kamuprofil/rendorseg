@@ -59,15 +59,20 @@ const debugLabel = createLabel({
 /** When enabled, applies a label to every element, regardless of URL. Useful for troubleshooting CSS selectors. */
 const debugMode = false;
 
-let accountLookup = {}
+/** For each label ID, contains the list of targeted accounts (ID, names, notes) */
+let accountData = {};
+
+/** Maps account names to a label ID. */
+let accountLookup = {};
 async function initLabels() {
     for (const labelId in labels) {
         const labelConfig = labels[labelId];
-        const lookup = toLookup(labelId, await fetchJson(labelConfig.source));
+        const accounts = await fetchJson(labelConfig.source);
+        accountData[labelId] = accounts;
+        const lookup = toLookup(labelId, accounts);
         Object.assign(accountLookup, lookup);
     }
 }
-
 
 async function init() {
     // Load built-in user lists
