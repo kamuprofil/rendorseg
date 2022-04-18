@@ -80,6 +80,7 @@ async function init() {
         // No lookups needed in debug mode
         if (!debugMode) {
             initLabels();
+            initCollector();
         }
     } catch (err) {
         console.error("Error fetching tagged account list: " + err);
@@ -230,6 +231,81 @@ function processFriendsList() {
 function processElements() {
     addCommentLabels();
     processFriendsList();
+    updateProfileData();
+}
+
+/** Lookup from account name to account data reference, containing only accounts with no ID */
+const unknownIds = {};
+/** Lookup from account ID to account data reference, containing only accounts with a known ID */
+const accountsById = {};
+// TODO: Wrap into namespace/module?
+function initCollector() {
+    // Create lookup used to check if we already have the ID for a profile with a given name
+    for (const labelId in accountData) {
+        const accounts = accountData[labelId];
+        for (const account of accounts) {
+            // Build lookup by ID
+            if (account.id) {
+                accountsById[account.id] = account;
+            }
+            // Build lookup by name for ID-less accounts
+            else {
+                for (const name of account.names) {
+                    unknownIds[name] = account;
+                }
+            }
+        }
+    }
+}
+
+function updateProfileData() {
+    // Check if we're on the profile page, process it if needed
+    const userNameHeader = document.querySelector('span > div > h1:not([data-has-label])');
+    if (!userNameHeader) {
+        return;
+    }
+
+    // Mark page so we don't reprocess itt
+    userNameHeader.setAttribute('data-has-label', 'null');
+
+    // Get profile name and ID
+    const profileName = window.location.pathname.slice(1);
+    const id = findUserId();
+
+    // Known name, new ID
+    const relatedAccount = unknownIds[profileName];
+    if (relatedAccount && !relatedAccount.id) {
+        if (id) {
+            relatedAccount.id = id;
+            delete unknownIds[profileName];
+            console.log(`### NEW ID: ${id} for account ${profileName}`);
+        }
+    }
+
+    // Known ID, new name
+    if (id) {
+        const previousAccount = accountsById[id];
+        if (previousAccount) {
+            if (!previousAccount.names.includes(profileName)) {
+                previousAccount.names.push(profileName);
+                console.log(`### NEW NAME: ${profileName} for account ID ${id}`);
+            }
+        }
+    }
+}
+
+const USER_ID_PATTERN = /"userVanity":"[a-zA-Z0-9.]+","userID":"(\d+)"/
+/** Extracts the userID from the current page, from one of the script blocks. */
+function findUserId() {
+    const scripts = document.querySelectorAll('script');
+    for (const script of scripts) {
+        const text = script.innerText;
+        const matches = text.match(USER_ID_PATTERN);
+        if (matches) {
+            return parseInt(matches[1], 10);
+        }
+    }
+    return null;
 }
 
 init();
