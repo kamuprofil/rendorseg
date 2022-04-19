@@ -79,7 +79,7 @@ async function init() {
     try {
         // No lookups needed in debug mode
         if (!debugMode) {
-            initLabels();
+            await initLabels();
             initCollector();
         }
     } catch (err) {
